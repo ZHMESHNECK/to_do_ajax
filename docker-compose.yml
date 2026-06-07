@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.9"
 
 services:
   db:
@@ -20,18 +20,30 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - todo_network
 
   jenkins:
-    image: jenkins/jenkins:lts
-    container_name: jenkins
-    user: root
+    build: .
+    container_name: todo_jenkins
     restart: unless-stopped
     ports:
       - "8080:8080"
-      - "50000:50000"
+      - "50000:50000"        # JNLP agent port
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - PYTHONPATH=/workspace
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - todo_network
+
+networks:
+  todo_network:
+    name: todo_network
 
 volumes:
   todo_mysql_data:
