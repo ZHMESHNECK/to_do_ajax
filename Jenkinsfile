@@ -1,53 +1,21 @@
 pipeline {
-    agent any
-
-    environment {
-        PYTHONUNBUFFERED = '1'
+    agent {
+        docker {
+            image 'python:3.11'
+        }
     }
 
     stages {
-
-        stage('Checkout') {
+        stage('Install') {
             steps {
-                checkout scm
+                sh 'pip install -r requirements.txt'
             }
         }
 
-        stage('Setup venv') {
+        stage('Test') {
             steps {
-                sh '''
-                    python -m venv venv
-                    . venv/Scripts/activate || source venv/bin/activate
-                    pip install -U pip
-                    pip install -r requirements.txt
-                '''
+                sh 'pytest -v'
             }
-        }
-
-        stage('Run tests') {
-            steps {
-                sh '''
-                    . venv/Scripts/activate || source venv/bin/activate
-                    pytest -v --tb=short --cov=app --cov-report=xml --cov-report=html
-                '''
-            }
-        }
-
-        stage('Publish coverage') {
-            steps {
-                publishHTML([
-                    reportDir: 'htmlcov',
-                    reportFiles: 'index.html',
-                    reportName: 'Coverage Report'
-                ])
-            }
-        }
-    }
-
-    post {
-        always {
-            archiveArtifacts artifacts: 'htmlcov/**', allowEmptyArchive: true
-            junit 'pytest.xml'
         }
     }
 }
