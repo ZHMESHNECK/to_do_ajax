@@ -97,7 +97,7 @@ class MainWindow:
         header = tk.Frame(self._root, bg=config.ACCENT, pady=10)
         header.pack(fill="x")
         tk.Label(
-            header, text="⚡ Ajax Todo", font=("Segoe UI", 16, "bold"),
+            header, text="⚡ Ajax Todo V2", font=("Segoe UI", 16, "bold"),
             bg=config.ACCENT, fg="white"
         ).pack()
 
@@ -207,7 +207,7 @@ class MainWindow:
             mark = "✓" if task.is_done else ""
             desc = (
                 task.description[:40] + "…") if len(task.description) > 40 else task.description
-            print(task.created_at)
+            # print(task.created_at)
             created = task.created_at.astimezone().strftime("%Y-%m-%d %H:%M")
             tags = ("done_tag",) if task.is_done else ()
             self._tree.insert("", "end", values=(
